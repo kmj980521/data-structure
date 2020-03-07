@@ -8,30 +8,30 @@ typedef int Data;
 
 typedef struct _node
 {
-		Data number; //노드에 저장된 데이터 값
-		struct _node* next; // 다음 노드를 가리켜줄 포인터 변수
+		Data number; //Data values stored on node
+		struct _node* next; //Pointer to point to next node
 }Node;
 
 
 typedef struct list {
 		Node* head;
 		Node* tail;
-		Node* cur; // 삭제 및 조회를 참조하기 위한 변수
-		Node* before; // 삭제 및 조회를 참조하기 위한 변수 
-		int num; //리스트에 저장된 갯수  
+		Node* cur; // Data for deletion and reference
+		Node* before; // Data for deletion and reference 
+		int num; //Number of variables stored in the list  
 }List;
 
 
 
-void Listin(List* plist);// 처음 리스트 만들기 
+void Listin(List* plist); // Generate a list 
 
 int insert(List* plist, Data data); //값 입력 후 노드 추가
 int LFirst(List* plist, Data* data);//처음 값 참조
 int move(List* plist, Data* data);// 두 번째 이후 노드 참조
 
 
-Data LRemove(List* plist);//노드 값 삭제
-int LCount(List* plist);//노드의 수 확인
+Data LRemove(List* plist);// delete the data
+int LCount(List* plist);// count the data
 
 
 #endif#pragma once
