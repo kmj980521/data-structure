@@ -3,7 +3,7 @@
 #include "ListSource.h"
 
 
-void Listin(List* plist)// 처음 리스트 만들기 
+void Listin(List* plist) //Generate a list 
 {
 	plist->head = (Node*)malloc(sizeof(Node));
 	plist->head->next = NULL;
@@ -44,7 +44,7 @@ int move(List* plist, Data* data)
 	*data = plist->cur->number;
 	return TRUE;
 }
-Data LRemove(List* plist)
+Data LRemove(List* plist) 
 {
 	Node* rpos = plist->cur;
 	Data nu = rpos->number;
