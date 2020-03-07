@@ -25,13 +25,13 @@ typedef struct list {
 
 void Listin(List* plist); // Generate a list 
 
-int insert(List* plist, Data data); //값 입력 후 노드 추가
-int LFirst(List* plist, Data* data);//처음 값 참조
-int move(List* plist, Data* data);// 두 번째 이후 노드 참조
+int insert(List* plist, Data data);  //input the data
+int LFirst(List* plist, Data* data);//reference the first data
+int move(List* plist, Data* data); //Reference the data
 
 
 Data LRemove(List* plist);// delete the data
-int LCount(List* plist);// count the data
+int LCount(List* plist); //count the number of data on the list
 
 
 #endif#pragma once
