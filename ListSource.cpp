@@ -10,11 +10,11 @@ void Listin(List* plist) //Generate a list
 	plist->num = 0;
 }
 
-int insert(List* plist, Data data) //리스트 처음 값 입력
+int insert(List* plist, Data data) //Save value to list
 {
 	Node* newNode = (Node*)malloc(sizeof(Node));
 	newNode->number = data;
-	newNode->next = plist->head->next; //NULL값이 저장됨
+	newNode->next = plist->head->next; 
 	plist->head->next = newNode;
 	(plist->num)++;
 
@@ -22,7 +22,7 @@ int insert(List* plist, Data data) //리스트 처음 값 입력
 }
 
 
-int LFirst(List* plist, Data* data)
+int LFirst(List* plist, Data* data) //input the data
 {
 	if (plist->head->next == NULL)
 		return FALSE;
@@ -34,7 +34,7 @@ int LFirst(List* plist, Data* data)
 	return TRUE;
 
 }
-int move(List* plist, Data* data)
+int move(List* plist, Data* data) //Reference the data
 {
 	if (plist->cur->next == NULL)
 		return FALSE;
@@ -44,7 +44,7 @@ int move(List* plist, Data* data)
 	*data = plist->cur->number;
 	return TRUE;
 }
-Data LRemove(List* plist) 
+Data LRemove(List* plist)  // Delete the data
 {
 	Node* rpos = plist->cur;
 	Data nu = rpos->number;
@@ -57,7 +57,7 @@ Data LRemove(List* plist)
 
 	return nu;
 }
-int LCount(List* plist)
+int LCount(List* plist) //count the number of data on the list
 {
 	return plist->num;
 }
