@@ -15,10 +15,10 @@ typedef struct _node
 
 typedef struct list {
 		Node* head;
-			Node* tail;
-				Node* cur;
-					Node* before;
-						int num; //데이터의 갯수 
+		Node* tail;
+		Node* cur;
+		Node* before;
+		int num; //리스트에 저장된 갯수  
 }List;
 
 
