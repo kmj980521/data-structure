@@ -1,4 +1,4 @@
-[200~#ifndef __ListSource_H__
+#ifndef __ListSource_H__
 #define __ListSource_H__
 
 
@@ -8,16 +8,16 @@ typedef int Data;
 
 typedef struct _node
 {
-		Data number; //노드에 저장할 값
-			struct _node* next;
+		Data number; //노드에 저장된 데이터 값
+		struct _node* next; // 다음 노드를 가리켜줄 포인터 변수
 }Node;
 
 
 typedef struct list {
 		Node* head;
 		Node* tail;
-		Node* cur;
-		Node* before;
+		Node* cur; // 삭제 및 조회를 참조하기 위한 변수
+		Node* before; // 삭제 및 조회를 참조하기 위한 변수 
 		int num; //리스트에 저장된 갯수  
 }List;
 
