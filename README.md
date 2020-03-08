@@ -6,9 +6,10 @@
 StackInit (Array Initialization)
 
 SIsEmpty(Check if stack is empty)
-
+  1.if stack is empty, return TRUE 
+  else return FALSE
 LookStack(Check the value of the stack)
-
+ 
 SPush(Input the data into stack)
 
 SPop(Delete the data in the stack)
