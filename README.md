@@ -7,10 +7,16 @@
 
 3. 새로운 값을 입력을 받을 때마다 동적할당을 통해 메모리 할당
 
-StackInit
-SIsEmpty
+StackInit(List Initialization)
 
-SPush
-SPoP
-SPeeK
-SCount
+SIsEmpty(Check if stack is empty)
+  -if stack is empty, return TRUE else return FALSE
+
+SPush(Input the data into stack)
+
+SPoP(Delete the data in the stack)
+
+SPeeK(See value in stack)
+
+SCount(Check the number of data stored in the stack)
+
