@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include<stdlib.h>
+typedef struct NodeType {
+	float cofe; //계수
+	int expon;//차수 cofe x ^ expon
+	struct NodeType* link;
+}Node;
+
+typedef struct nodeList
+{
+	Node* head; //처음 위치
+	Node* last; //마지막 위치
+}List;
+List* makeList()
+{
+	List* newList;
+	newList = (List*)malloc(sizeof(List));
+	newList->head = NULL;
+	newList->last = NULL;
+
+	return newList;
+
+}
+void appendTerm(List* inputList, float cofe, int expon)
+{
+
+	if (inputList->head == NULL) //노드가 없을 때
+	{
+		Node* newnode = (Node*)malloc(sizeof(Node));
+		newnode->cofe = cofe; //데이터 입력 
+		newnode->expon = expon;
+		inputList->head = newnode;
+		inputList->last = newnode;
+		newnode->link = NULL;
+	}
+	else //노드가 있으면
+	{
+		Node* newnode = (Node*)malloc(sizeof(Node));
+		newnode->cofe = cofe; //데이터 입력 
+		newnode->expon = expon;
+		inputList->last->link = newnode; //끝이 가리키는 노드의 다음 링크가 새 노드로 감.
+		inputList->last = newnode;
+		newnode->link = NULL; //새 노드의 다음은 NULL
+	}
+}
+
+void printList(List* inputList)
+{
+	if (inputList->head == NULL)
+	{
+		printf("리스트가 존재하지 않습니다. \n");
+	}
+	else
+	{
+		Node* newnode = (Node*)malloc(sizeof(Node));
+		newnode = inputList->head;
+		while (newnode != NULL)
+		{
+			if (newnode->link == NULL)
+			{
+				printf("%.0fx^%d", newnode->cofe, newnode->expon); //끝 항은 뒤에 +가 붙으면 안 되므로 if문 
+				break;
+			}
+			printf("%.0fx^%d + ", newnode->cofe, newnode->expon);
+			newnode = newnode->link;
+		}
+		printf("\n");
+	}
+}
+List* AddList(List* ListA, List* ListB)
+{
+	List* ListC;
+	ListC = makeList();
+	Node* newnodeA = (Node*)malloc(sizeof(Node)); //A의 참조를 위해
+	newnodeA = ListA->head;
+	Node* newnodeB = (Node*)malloc(sizeof(Node)); //B의 참조를 위해
+	newnodeB = ListB->head;
+	while ((newnodeA != NULL) && (newnodeB != NULL)) //모두 끝까지 참조를 했다면. 
+	{
+		if ((newnodeA->expon) > (newnodeB->expon)) //A의 차수가 크다면 
+		{
+			appendTerm(ListC, newnodeA->cofe, newnodeA->expon); //C에 A차수랑 계수 삽입.
+			newnodeA = newnodeA->link; //한 칸 이동
+		}
+		else if ((newnodeA->expon) == (newnodeB->expon)) //차수가 같다면.
+		{
+			appendTerm(ListC,(newnodeA->cofe)+(newnodeB->cofe),newnodeA->expon); //A의 차수를 보내고, 계수는 둘을 더한 값.
+			newnodeA = newnodeA->link; //한 칸 이동
+			newnodeB = newnodeB->link; //한 칸 이동
+		}
+		else//B의 차수가 더 크다면.
+		{
+			appendTerm(ListC, newnodeB->cofe, newnodeB->expon);
+			newnodeB = newnodeB->link;
+		}
+	}
+	if (newnodeA == NULL) //newNodeA가 NULL이면 즉 A노드는 참조가 끝났는데 B노드가 남아있으면
+	{
+		while (newnodeB != NULL)
+		{
+			appendTerm(ListC, newnodeB->cofe, newnodeB->expon);
+			newnodeB = newnodeB->link;
+		}
+	}
+	else if (newnodeB == NULL) //newNodeA가 NULL이면 즉 B노드는 참조가 끝났는데 A노드가 남아있으면
+	{
+		while (newnodeA != NULL)
+		{
+			appendTerm(ListC, newnodeA->cofe, newnodeA->expon);
+			newnodeA = newnodeA->link;
+		}
+	}
+
+	return ListC;
+}
+int main()
+{
+	List* myListA;
+	myListA = makeList();
+	appendTerm(myListA, 5, 6);
+	appendTerm(myListA, 3, 4);
+	appendTerm(myListA, 2, 2);
+
+	printf("A(x) = ");
+	printList(myListA);
+
+	List* myListB;
+	myListB = makeList();
+	appendTerm(myListB, 2, 7);
+	appendTerm(myListB, 2, 4);
+	appendTerm(myListB, 2, 3);
+	appendTerm(myListB, 7, 1);
+	appendTerm(myListB, 1, 0);
+
+
+	printf("B(x) = ");
+	printList(myListB);
+
+	List* myListC;
+	myListC = makeList();
+	myListC = AddList(myListA, myListB);
+	printf("C(x) = ");
+	printList(myListC);
+	return 0;
+}
+
