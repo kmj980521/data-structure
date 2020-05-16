@@ -1,0 +1,300 @@
+#include <stdio.h>
+#include <stdlib.h>
+//트리
+typedef struct myTreeNode {
+	int data;
+	struct myTreeNode* left;
+	struct myTreeNode* right;
+	struct myTreeNode* link_queue; //레벨 순회할 때 사용
+	struct myTreeNode* link_stack; //전,중,후위 순회할 때 사용
+	int visit_level;//레벨순회할 때 방문여부
+	int visit_infix;//중위순회할 때 방문여부
+	int visit_prefix;//전위순회할 때 방문여부
+	int visit_postfix;//후위순회할 때 방문여부
+}TreeNode;
+TreeNode* makeNode(TreeNode* left, TreeNode* right,int data )
+{
+	TreeNode* new_node = (TreeNode*)malloc(sizeof(TreeNode));
+	new_node->data = data;
+	new_node->left = left;
+	new_node->right = right;
+	new_node->link_queue = NULL;//큐 구조를 사용할 때 사용할 링크필드, 레벨 순회때 사용
+	new_node->link_stack = NULL;//스택 구조를 사용할 때 사용할 링크필드, 전,중,후위 순회때 사용
+	new_node->visit_infix = 0; //중위 순회 방문하지 않았다고 초기화
+	new_node->visit_prefix = 0;// 전위 순회 방문하지 않았다고 초기화
+	new_node->visit_postfix = 0; // 후위 순회 방문하지 않았다고 초기화
+	new_node->visit_level = 0;// 레벨 순회 방문하지 않았다고 초기화
+	return new_node;
+}
+TreeNode* getLeft(TreeNode* input)
+{
+	return input->left;
+}
+TreeNode* getRight(TreeNode* input)
+{
+	return input->right;
+}
+
+
+// 큐
+TreeNode* front;//앞을 가리키는 노드
+TreeNode* rear;//뒤를 가리키는 노드
+
+int isEmptyQueue()
+{
+	if (front == NULL)
+	{
+		return 1;
+	}
+	else
+		return 0;
+}
+void enQueue(TreeNode* input)
+{
+	if (front == NULL)
+	{
+		front = input;
+		rear = input;
+	}
+	else
+	{
+		rear->link_queue = input;
+		rear = input;
+	}
+}
+TreeNode* deQueue()
+{
+	if (isEmptyQueue())
+	{
+		printf("큐가 비었습니다\n");
+		return -1;
+	}
+	else
+	{
+		TreeNode* del_node = front;
+		front = front->link_queue;
+		return del_node;
+	}
+}
+//-------------------------------------------------//
+TreeNode* top;// 전,중,후위 순회 할 때 스택에 사용
+
+int isEmptyStack()
+{
+	if (top == NULL)
+	{
+		return 1;
+	}
+	else
+		return 0;
+}
+void pushStack(TreeNode* input)
+{
+	if (top == NULL) //스택이 비었으면.
+	{
+		top = input;
+		input->link_stack = NULL;
+	}
+	else
+	{
+		input->link_stack = top;
+		top = input;
+	}
+	
+}
+TreeNode* popStack()
+{
+	if (top == NULL)
+	{
+		printf("스택이 비었습니다\n");
+		return -1;
+	}
+	else
+	{
+		TreeNode* del_node = top;
+		top = top->link_stack;
+		return del_node;
+
+	}
+}
+void TraverLevel(TreeNode* input) //레벨 참조,  너비 우선 탐색 참고.
+{
+	front = NULL;
+	rear = NULL;
+	TreeNode* refer= input;
+	enQueue(refer);//첫 노드를 큐에 삽입
+	refer->visit_level = 1;//방문했다고 표시
+	while (!isEmptyQueue())//큐가 빌 때까지 반복
+	{
+		refer = deQueue();
+		if (refer->visit_level == 1)//방문을 한 노드라면
+		{
+			printf("%d ", refer->data);
+		}
+		
+		if (refer->left != NULL) // FIFO구조에따라 먼저 들어간 것이 먼저 나옴. 선입선출 
+		{
+			enQueue(getLeft(refer));
+			getLeft(refer)->visit_level = 1;
+		}
+		if (refer->right != NULL)
+		{
+			enQueue(getRight(refer));
+			getRight(refer)->visit_level = 1;
+		}
+	}
+}
+
+//
+void TraverInfix(TreeNode* input)//중위 순회
+{
+	TreeNode* refer=(TreeNode*)malloc(sizeof(TreeNode));
+	refer = input;
+	top = NULL; //스택 초기화
+	while (1)
+	{
+		while (refer != NULL&&refer->visit_infix!=1)
+		{
+			pushStack(refer);
+			refer->visit_infix = 1; //방문을 표시
+			refer = getLeft(refer);
+		}
+		if (isEmptyStack())
+		{
+			break;
+		}
+		refer = popStack();
+		if (refer->visit_infix == 1)
+		{
+			printf("%d ", refer->data);
+		}	
+		refer = getRight(refer);
+
+			
+	
+	}
+}
+
+void TraverPrefix(TreeNode* input)//전위
+{
+	TreeNode* refer=input;
+	top = NULL;
+	pushStack(refer);
+	refer->visit_prefix = 1;
+	while (!isEmptyStack())//스택이 빌 때까지 반복.
+	{
+
+		refer = popStack();
+		if (refer->visit_prefix == 1) //방문을 한 노드라면 
+		{
+			printf("%d ", refer->data);
+			if (refer->right != NULL)
+			{
+				pushStack(getRight(refer));
+				getRight(refer)->visit_prefix = 1;//방문을 표시
+			}
+			if (refer->left != NULL)
+			{
+
+				pushStack(getLeft(refer));// 스택구조를 사용하므로 후입 선출 LIFO
+				getLeft(refer)->visit_prefix = 1;//방문을 표시
+			}
+		}
+		
+		
+	}
+}
+void TraverPostfix(TreeNode* input)//후위 순회
+{
+	
+	TreeNode* refer= input;
+	pushStack(refer);
+	while (!isEmptyStack() ) {
+		refer = popStack();
+
+		if (refer->visit_postfix == 1) { //방문을 한 노드라면 출력해주고 continue로인해 새로운 노드를 얻음, 루트노드는 방문하지 않았다고 가정
+			printf("%d ", refer->data);
+			continue;
+		}
+		refer->visit_postfix = 1; //방문을 표시
+
+		if (refer->left == NULL && refer->right == NULL) { //리프노드라면 출력진행
+			printf("%d ", refer->data);
+		}
+		else {
+			pushStack(refer); //리프노드가 아니라면 다시 넣어주고 
+
+			if (getRight(refer) != NULL) //LIFO구조를 따라 먼저 들어간 것이 나중에 나옴.
+			{
+				pushStack(getRight(refer));
+			}
+			if (getLeft(refer) != NULL) //LIFO구조를 따라 나중에 들어간 것이 먼저 나옴.
+			{
+				pushStack(getLeft(refer));
+			}
+		}
+	}
+}
+void freeTree(TreeNode* input)
+{
+	if (input == NULL)
+		return 0;
+	freeTree(input->left);
+	freeTree(input->right);
+	free(input);
+}
+	
+int main()
+{
+	printf("=========트리의 구조=========\n");
+	printf("             1          \n");
+	printf("     3              4        \n");
+	printf("  7     9        12    15    \n");
+	printf("10    11  13	         19\n");
+	printf("\n");
+	printf("위의 트리로 1.중위 순회 2.전위 순회 3.후위 순회 4.레벨 순회 5.메모리 할당 해제를 실행합니다.\n");
+	printf("==========프로그램을 시작합니다==========\n");
+	printf("\n");
+	TreeNode* Node_K = makeNode(NULL, NULL, 19 ); //왼쪽노드, 오른쪽노드, 데이터필드의 값
+	TreeNode* Node_J = makeNode(NULL, NULL, 13);
+	TreeNode* Node_I = makeNode(NULL, NULL, 11);
+	TreeNode* Node_H = makeNode(NULL, NULL, 10);
+
+	//중간 레벨 노드
+	TreeNode* Node_D = makeNode(Node_H, NULL, 7);
+	TreeNode* Node_E = makeNode(Node_I, Node_J, 9);
+	TreeNode* Node_F = makeNode(NULL, NULL, 12);
+	TreeNode* Node_G = makeNode(NULL, Node_K, 15);
+
+	TreeNode* Node_B = makeNode(Node_D, Node_E, 3);
+	TreeNode* Node_C = makeNode(Node_F, Node_G, 4);
+
+	//루트노드
+	TreeNode* Node_A = makeNode(Node_B, Node_C, 1);
+	
+	printf("1) 중위 순회 결과 : ");
+	TraverInfix(Node_A);
+	printf("\n");
+
+	printf("2) 전위 순회 결과 : ");
+	TraverPrefix(Node_A);
+	printf("\n");
+
+	printf("3) 후위 순회 결과 : ");
+	TraverPostfix(Node_A);
+	printf("\n");
+
+	printf("4) 레벨 순회 결과 : ");
+	TraverLevel(Node_A);
+	printf("\n");
+
+	printf("5) 메모리 할당 해제 \n");
+	freeTree(Node_A); //메모리 할당 해제
+
+	printf("무사히 메모리 할당 해제를 완료했습니다.\n");
+	printf("========== 프로그램을 종료합니다. ==========");
+	return 0;
+}
+
+
+
