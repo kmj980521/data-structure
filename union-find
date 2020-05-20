@@ -1,0 +1,54 @@
+#include <stdio.h>
+//부모노드 찾기
+int getParent(int parent[], int x)
+{
+	if (parent[x] == x) //자기 자신이 루트
+		return x;
+	else
+		return parent[x] = getParent(parent, parent[x]);//특정한 노드에 저장된 값-> 새로운 노드
+}
+
+//부모노드 합치기
+void unionParent(int parent[], int a, int b)
+{
+	a = getParent(parent, a);
+	b = getParent(parent, b);
+	if (a < b)//작은 것이 우선이라고 가정
+	{
+		parent[b] = a; //b의 부모가 a가 됨
+	}
+	else
+		parent[a] = b;
+}
+
+//같은 부모를 가지는지, 같은 그래프에 속하는지 
+int findParent(int parent[], int a, int b)
+{
+	a = getParent(parent, a);
+	b = getParent(parent, b);
+	if (a == b)
+	{
+		return 1;
+	}
+	else
+		return 0;
+}
+
+
+int main(void)
+{
+	int parent[11];
+	for (int i = 1; i <= 10; i++)
+	{
+		parent[i] = i;
+	}
+	unionParent(parent, 1, 2);
+	unionParent(parent, 2, 3);
+	unionParent(parent, 3, 4);
+	unionParent(parent, 5, 6);
+	unionParent(parent, 6, 7);
+	unionParent(parent, 7, 8);
+	printf("1과 5가 연결이 되어 있나요? %d\n", findParent(parent, 1, 5));
+	unionParent(parent, 1, 5);
+	printf("1과 5가 연결이 되어 있나요? %d", findParent(parent, 1, 5));
+}
