@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+
+int main(void)
+{
+	int i, j;
+	int temp;
+
+	int arr[4] = { 3,2,4,1 };
+
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3 - i; j++)
+		{
+			if (arr[j] > arr[j + 1])
+			{
+				temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+	for (int k = 0; k < 4; k++)
+	{
+		printf("%2d", arr[k]);
+	}
+
+
+}
