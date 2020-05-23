@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+
+int main(void)
+{
+	int i, j;
+	int temp;
+
+	int arr[6] = { 3,2,4,1, 5,9 };
+	int min = 9999;
+	int index;
+	for (i = 0; i < 6; i++)
+	{
+		min = 9999;
+		for (j = i; j < 6 ; j++)
+		{
+			if (arr[j] < min)
+			{
+				min = arr[j];
+				index = j;
+			}
+		}
+		temp = arr[i];
+		arr[i] = arr[index];
+		arr[index] = temp;
+
+	}
+	for (int k = 0; k < 6; k++)
+	{
+		printf("%2d", arr[k]);
+	}
+
+
+}
