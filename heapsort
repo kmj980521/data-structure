@@ -1,0 +1,138 @@
+
+#include<stdio.h>
+
+#define TRUE 1
+#define FALSE 0
+
+#define ARRAY_LENGTH 100
+typedef int comp(int data1, int data2);
+
+typedef struct myHEAP
+{
+	int num;
+	int array[ARRAY_LENGTH];
+	comp* cp;
+}heap;
+
+int isempty(heap* input)
+{
+	if (input->num == 0)
+	{
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+int getparent(int idx)
+{
+	return idx / 2;
+}
+int getLchild(int idx)
+{
+	return idx * 2;
+}
+int getRchild(int idx)
+{
+	return (idx * 2 + 1);
+}
+void heapinit(heap* input, comp cp)
+{
+	input->num = 0;
+	input->cp = cp;
+}
+//int comp(int a, int b)
+//{
+//	return b - a; //오름차순
+//}
+void heapinsert(heap* input, int data)
+{
+	int idx = input->num + 1; //마지막 데이터 삽입했다고 가정
+	while (idx != 1)
+	{
+		if (input->cp(data, input->array[getparent(idx)]) > 0) //부모의 값이 더 크면
+		{
+			input->array[idx] = input->array[getparent(idx)]; //값을 올려줌
+			idx = getparent(idx); //부모의 인덱스 값을 받음
+		}
+		else
+		{
+			break;
+		}
+	}
+	input->array[idx] = data;
+	input->num += 1;
+}
+int getHighIdx(heap* input, int idx)
+{
+	if (getLchild(idx) > input->num)
+	{
+		return 0; //스탑
+	}
+	else if (getLchild(idx) == input->num)
+	{
+		return getLchild(idx);
+	}
+	else
+	{
+		if (input->cp(input->array[getLchild(idx)], input->array[getRchild(idx)]) > 0) //오른쪽의 값이 더 크다면
+		{
+			return getLchild(idx);
+		}
+		else
+			return getRchild(idx);
+	}
+}
+int  heapdelete(heap* input)
+{
+	int first_data = input->array[1]; //첫번째 데이터 
+
+	int last_data = input->array[input->num]; //마지막 데이터
+
+	int parentidx = 1;
+	int child;
+	while (child = getHighIdx(input, parentidx))// 더 우선순위가 높은 즉 값이 작은 노드를 부모노드를 통해 찾음
+	{
+		if (input->cp(last_data, input->array[child]) >= 0)//자식의 값이 더 크면
+		{
+			break;
+		}
+		input->array[parentidx] = input->array[child];
+		parentidx = child;
+	}
+	input->array[parentidx] = last_data;
+	input->num -= 1;
+	return first_data;
+}
+
+
+int compare(int data1, int data2)
+{
+	return data2 - data1;
+}
+void heapsort(int arr[], int length, comp cp)
+{
+	heap myheap;
+	int i;
+
+	heapinit(&myheap, cp);
+
+	for (i = 0; i < 4; i++)
+	{
+		heapinsert(&myheap, arr[i]);
+	}
+	for (i = 0; i < 4; i++)
+	{
+		arr[i] = heapdelete(&myheap);
+	}
+}
+int main(void)
+{
+	int arr[4] = { 3,4,2,1 };
+	int i;
+	heapsort(arr, sizeof(arr) / sizeof(int), compare);
+
+	for (i = 0; i < 4; i++)
+	{
+		printf("%d ", arr[i]);
+	}
+}
