@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include<stdlib.h>
+void last_merge(int arr[], int left, int mid, int right)
+{
+	int lidx = left;
+	int ridx = mid + 1;
+	int sidx = left;
+	int* sort = (int*)malloc(sizeof(int) * (right + 1));
+	while (lidx <= mid && ridx <= right)
+	{
+		if (arr[lidx] <= arr[ridx])
+		{
+			sort[sidx] = arr[lidx++];
+		}
+		else
+			sort[sidx] = arr[ridx++];
+		sidx++;
+	}
+	if (lidx > mid)
+	{
+		for (int i = ridx; i <= right; i++)
+		{
+			sort[sidx] = arr[ridx];
+			sidx++;
+		}
+	}
+	else
+	{
+		for (int i = lidx; i <= mid; i++)
+		{
+			sort[sidx] = arr[lidx];
+			sidx++;
+		}
+	}
+	
+	for (int i = left; i <= right; i++)
+	{
+		arr[i] = sort[i];
+	}
+	free(sort);
+}
+
+void mergesort(int arr[], int left, int right)
+{
+	int mid;
+	if (left < right)
+	{
+		mid = (left + right) / 2;
+
+		mergesort(arr, left, mid);
+		mergesort(arr, mid + 1, right);
+
+		last_merge(arr, left, mid, right);
+	}
+}
+void main() {
+	int arr[10] = { 2 ,5 ,7 ,1 , 91, 23, 32, 21, 34, 0 };
+	int size = sizeof(arr) / sizeof(int);
+	mergesort(arr, 0, size - 1);
+	for (int i = 0; i < size; i++)
+	{
+		printf("%d ", arr[i]);
+	}
+
+}
