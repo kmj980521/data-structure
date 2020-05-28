@@ -1,0 +1,153 @@
+#include <stdio.h>
+typedef int element;
+int size, i = 0;
+int j = 0;
+int k = 0;
+// 주어진 부분집합 안에서 피봇의 위치를 확정하여 분할 위치를 정하는 연산
+int partition_begin(element a[], int begin, int end) {
+	int  pivot, L, R, t;
+	element temp;
+	L = begin;
+	R = end;
+	pivot = begin;	// 중간에 위치한 원소를 피봇 원소로 선택
+
+	printf("\n [%d단계 : pivot=%d ] \n", ++i, a[pivot]);
+	while (L < R) {
+		while ((a[L] < a[pivot]) && (L < R)) L++; //왼쪽부터 순회하며 크거나 같은 값을 찾으면 멈춤
+		while ((a[R] >= a[pivot]) && (L < R)) R--; //오른쪽부터 순회하며 피봇보다 작은 값을 찾으면 멈춤
+		if (L < R) {					// L과 R 원소의 자리 교환
+			temp = a[L];
+			a[L] = a[R];
+			a[R] = temp;
+
+			if (L == pivot)			// L이 피봇인 경우,             
+				pivot = R;			// 변경된 피봇의 위치(R)를 저장! 
+		} // if(L<R)
+	} // while(L<R)
+
+	  // (L=R)이 된 경우, 
+	  // 더 이상 진행할 수 없으므로 R 원소와 피봇 원소의 자리를 교환하여 마무리
+	temp = a[pivot];
+	a[pivot] = a[R];
+	a[R] = temp;
+	for (t = 0; t < size; t++) printf(" %d", a[t]);	// 현재의 정렬 상태 출력
+	printf("\n");
+	return R;	// 정렬되어 확정된 피봇의 위치 반환
+}
+
+void quickSort_begin(element a[], int begin, int end) {
+	int p;
+	if (begin < end) {
+		p = partition_begin(a, begin, end);	// 피봇의 위치에 의해 분할 위치 결정
+		quickSort_begin(a, begin, p - 1);		// 피봇의 왼쪽 부분집합에 대해 퀵 정렬을 재귀호출
+		quickSort_begin(a, p + 1, end);		// 피봇의 오른쪽 부분집합에 대해 퀵 정렬을 재귀호출
+	}
+}
+int partition_mid(element a[], int begin, int end) {
+	int  pivot, L, R, t;
+	element temp;
+	L = begin;
+	R = end;
+	pivot = (int)((begin+end)/2.0);	// 중간에 위치한 원소를 피봇 원소로 선택
+
+	printf("\n [%d단계 : pivot=%d ] \n", ++j, a[pivot]);
+	while (L < R) {
+		while ((a[L] < a[pivot]) && (L < R)) L++; //왼쪽부터 순회하며 크거나 같은 값을 찾으면 멈춤
+		while ((a[R] >= a[pivot]) && (L < R)) R--; //오른쪽부터 순회하며 피봇보다 작은 값을 찾으면 멈춤
+		if (L < R) {					// L과 R 원소의 자리 교환
+			temp = a[L];
+			a[L] = a[R];
+			a[R] = temp;
+
+			if (L == pivot)			// L이 피봇인 경우,             
+				pivot = R;			// 변경된 피봇의 위치(R)를 저장! 
+		} // if(L<R)
+	} // while(L<R)
+
+	  // (L=R)이 된 경우, 
+	  // 더 이상 진행할 수 없으므로 R 원소와 피봇 원소의 자리를 교환하여 마무리
+	temp = a[pivot];
+	a[pivot] = a[R];
+	a[R] = temp;
+	for (t = 0; t < size; t++) printf(" %d", a[t]);	// 현재의 정렬 상태 출력
+	printf("\n");
+	return R;	// 정렬되어 확정된 피봇의 위치 반환
+}
+
+void quickSort_mid(element a[], int begin, int end) {
+	int p;
+	if (begin < end) {
+		p = partition_mid(a, begin, end);	// 피봇의 위치에 의해 분할 위치 결정
+		quickSort_mid(a, begin, p - 1);		// 피봇의 왼쪽 부분집합에 대해 퀵 정렬을 재귀호출
+		quickSort_mid(a, p + 1, end);		// 피봇의 오른쪽 부분집합에 대해 퀵 정렬을 재귀호출
+	}
+}
+int partition_last(element a[], int begin, int end) {
+	int  pivot, L, R, t;
+	element temp;
+	L = begin;
+	R = end;
+	pivot = end;	// 중간에 위치한 원소를 피봇 원소로 선택
+
+	printf("\n [%d단계 : pivot=%d ] \n", ++k, a[pivot]);
+	while (L < R) {
+		while ((a[L] < a[pivot]) && (L < R)) L++; //왼쪽부터 순회하며 크거나 같은 값을 찾으면 멈춤
+		while ((a[R] >= a[pivot]) && (L < R)) R--; //오른쪽부터 순회하며 피봇보다 작은 값을 찾으면 멈춤
+		if (L < R) {					// L과 R 원소의 자리 교환
+			temp = a[L];
+			a[L] = a[R];
+			a[R] = temp;
+
+			if (L == pivot)			// L이 피봇인 경우,             
+				pivot = R;			// 변경된 피봇의 위치(R)를 저장! 
+		} // if(L<R)
+	} // while(L<R)
+
+	  // (L=R)이 된 경우, 
+	  // 더 이상 진행할 수 없으므로 R 원소와 피봇 원소의 자리를 교환하여 마무리
+	temp = a[pivot];
+	a[pivot] = a[R];
+	a[R] = temp;
+	for (t = 0; t < size; t++) printf(" %d", a[t]);	// 현재의 정렬 상태 출력
+	printf("\n");
+	return R;	// 정렬되어 확정된 피봇의 위치 반환
+}
+
+void quickSort_last(element a[], int begin, int end) {
+	int p;
+	if (begin < end) {
+		p = partition_last(a, begin, end);	// 피봇의 위치에 의해 분할 위치 결정
+		quickSort_last(a, begin, p - 1);		// 피봇의 왼쪽 부분집합에 대해 퀵 정렬을 재귀호출
+		quickSort_last(a, p + 1, end);		// 피봇의 오른쪽 부분집합에 대해 퀵 정렬을 재귀호출
+	}
+}
+void main() {
+	element list[8] = { 69, 10, 30, 2, 16, 8, 31, 22 };
+	size = 8;	// list 배열의 원소 개수
+	printf("\n [ 초기 상태 ] \n");
+	for (int i = 0; i <= size - 1; i++) printf(" %d", list[i]);
+	printf("\n");
+
+	printf("<<<<<<Pivot이 첫 번째 위치일 때 퀵정렬입니다.>>>>>> \n");
+	quickSort_begin(list, 0, size - 1);
+	printf("\n");
+
+	element list2[8] = { 60, 20 , 7 ,19 ,29 ,32 ,34 ,4 };
+	int size2 = 8;
+	printf("\n [ 초기 상태 ] \n");
+	for (int i = 0; i <= size2 - 1; i++) printf(" %d", list2[i]);
+	printf("\n");
+	printf("<<<<<<Pivot이 중간 위치일 때 퀵정렬입니다.>>>>>> \n");
+	quickSort_mid(list2, 0, size2 - 1);
+	printf("\n");
+
+	element list3[8] = { 8, 65, 23, 3, 1, 59, 20, 40 };
+	int size3 = 8;
+	printf("\n [ 초기 상태 ] \n");
+	for (int i = 0; i <= size3 - 1; i++) printf(" %d", list3[i]);
+	printf("\n");
+	printf("<<<<<<Pivot이 마지막 위치일 때 퀵정렬입니다.>>>>>> \n");
+	quickSort_last(list3, 0, size3- 1);
+	printf("\n");
+
+}
