@@ -1,0 +1,268 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <math.h>
+
+typedef struct avl_node {
+	struct avl_node* left_child, * right_child;  /* Subtrees. */
+	int data;                   /* Pointer to data. */
+} AVL_node;
+
+AVL_node* root; //트리
+
+// 오른쪽 회전 함수
+AVL_node* rotate_right(AVL_node* parent)
+{
+	AVL_node* child = parent->left_child;
+	parent->left_child = child->right_child;
+	child->right_child = parent;
+	return child;
+}
+// 왼쪽 회전 함수
+AVL_node* rotate_left(AVL_node* parent)
+{
+	AVL_node* child = parent->right_child;
+	parent->right_child = child->left_child;
+	child->left_child = parent;
+	return child;
+}
+// 오른쪽-왼쪽 회전 함수
+AVL_node* rotate_right_left(AVL_node* parent)
+{
+	AVL_node* child = parent->right_child;
+	parent->right_child = rotate_right(child);
+	return rotate_left(parent);
+}
+// 왼쪽-오른쪽 회전 함수
+AVL_node* rotate_left_right(AVL_node* parent)
+{
+	AVL_node* child = parent->left_child;
+	parent->left_child = rotate_left(child);
+	return rotate_right(parent);
+}
+// 트리의 높이를 반환
+int get_height(AVL_node* node)
+{
+	int height = 0;
+	if (node != NULL)
+		height = 1 + fmax(get_height(node->left_child), get_height(node->right_child));
+	return height;
+}
+
+// 노드의 균형인수를 반환
+int get_height_diff(AVL_node* node)
+{
+	if (node == NULL) return 0;
+	return get_height(node->left_child) - get_height(node->right_child);
+}
+
+// 트리를 균형트리로 만든다
+AVL_node* rebalance(AVL_node** node)
+{	
+	int height_diff = get_height_diff(*node);            // 균형 인수 계산
+	// 균형 인수가 +2 이상이면 LL 상태 또는 LR 상태
+	if (height_diff > 1) {        // 왼쪽 서브 트리 방향으로 높이가 2 이상 크다면,
+		if (get_height_diff((*node)->left_child) > 0)
+			*node = rotate_right(*node);            // LL
+		else
+			*node = rotate_left_right(*node);       // LR
+	}
+	// 균형 인수가 -2 이상이면 RR 상태 또는 RL 상태
+	else if (height_diff < -1) {     // 오른쪽 서브 트리 방향으로 높이가 2 이상 크다면,
+		if (get_height_diff((*node)->right_child) < 0)
+			*node = rotate_left(*node);             // RR
+		else
+			*node = rotate_right_left(*node);       // RL
+	}
+	return *node;
+}
+
+// AVL 트리의 삽입 연산
+AVL_node* avl_add(AVL_node** root, int new_key)
+{
+	if (*root == NULL) {
+		*root = (AVL_node*)malloc(sizeof(AVL_node));
+		if (*root == NULL) {
+			fprintf(stderr, "메모리 할당 에러\n");
+			exit(1);
+		}
+		(*root)->data = new_key;
+		(*root)->left_child = (*root)->right_child = NULL;
+	}
+	else if (new_key < (*root)->data) {
+		(*root)->left_child = avl_add(&((*root)->left_child), new_key);
+		*root = rebalance(root);
+	}
+	else if (new_key > (*root)->data) {
+		(*root)->right_child = avl_add(&((*root)->right_child), new_key);
+		(*root) = rebalance(root);
+	}
+	else {
+		fprintf(stderr, "중복된 키 에러\n");
+		exit(1);
+	}
+	return *root;
+}
+
+AVL_node* maxNode(AVL_node* input)
+{
+	AVL_node* max_node = input;
+	while (max_node->right_child != NULL) //제일 왼쪽 마지막 노드 찾기
+	{
+		max_node = max_node->right_child;
+	}
+	return max_node;
+}
+
+int getData(AVL_node* node) //노드의 데이터필드의 값을 반환
+{
+	return node->data;
+}
+AVL_node* delete(AVL_node** root, int key)
+{
+	if ((*root) == NULL)
+	{
+		printf("노드가 없습니다\n");
+		exit(1);
+	}
+	AVL_node* del=(*root); //트리의 루트 노드를 가리킴
+	AVL_node* parent=(AVL_node*)malloc(sizeof(AVL_node));//삭제할 노드의 부모노드
+
+	parent = del;
+	while (del != NULL && getData(del) != key)// del이 끝노드(=노드가 없음) 이거나 특정한 위치의 값을 찾았을 때 정지.
+	{
+		parent = del;
+		if (key < getData(del)) //특정한 key의 값이 del노드의 데이터필드의 값보다 작으면 왼쪽으로
+		{
+			del = del->left_child;
+		}
+		else //특정한 key의 값이 del노드의 데이터필드의 값보다 작으면 오른쪽으로
+			del = del->right_child;
+	}
+	if (del == NULL)
+	{
+		printf("현재 트리에 삭제 대상이 존재하지 않습니다\n");
+		return NULL;
+	}
+	else
+	{
+		if (parent == del)
+		{
+			(*root) = NULL; //트리 및 서브트리에서 노드가 하나라면 삭제를 진행 
+		}
+		else if (del->left_child == NULL && del->right_child == NULL) //리프노드이면
+		{
+		
+			if (parent->left_child == del)//부모노드의 왼쪽 자식노드가 삭제하려는 노드이면 
+			{
+				parent->left_child = NULL;//부모노드의 왼쪽을 NULL로 바꿔줌
+			}
+			else if(parent->right_child=del)
+			{
+				parent->right_child = NULL;
+			}
+		}
+		else if (del->left_child == NULL || del->right_child == NULL) //삭제할 노드의 차수가 1이면
+		{
+			if (del->left_child != NULL)//삭제하려는 노드의 오른쪽에 자식노드가 존재한다면
+			{
+				if (parent->left_child == del)//부모노드의 왼쪽이 del이라면
+				{
+					parent->left_child = del->left_child;
+				}
+				else
+				{
+					parent->right_child = del->left_child;
+				}
+			}
+			else //삭제하려는 노드의 왼쪽에 자식노드가 존재한다면 
+			{
+				if (parent->left_child == del)
+				{
+					parent->left_child = del->right_child;
+				}
+				else
+				{
+					parent->right_child = del->right_child;
+				}
+			}
+		}
+		else if (del->left_child != NULL && del->right_child != NULL)
+		{
+			AVL_node* max_node = (AVL_node*)malloc(sizeof(AVL_node)); //후계자 노드를 저장할 것임.
+			max_node = del->left_child;
+			AVL_node* pmax_node = del; //삭제할 값의 부모노드
+			int data; //삭제할 값.
+
+			while (max_node->right_child != NULL)
+			{
+				pmax_node = max_node;
+				max_node = max_node->right_child;
+			}
+			data = del->data; //삭제하려는 노드의 데이터 값
+
+			del->data = max_node->data; //삭제할 노드에 후계자 노드의 데이터를 넣어줌.
+
+			if (pmax_node->left_child == max_node)
+			{
+				pmax_node->left_child = max_node->left_child;
+			}
+			else
+			{
+				pmax_node->right_child = max_node->left_child;
+			}
+			del = max_node;
+			del->data = data;
+		}
+	}
+	*root = rebalance(root);//트리를 균형트리로 만듦
+	return del;
+}
+
+
+// AVL 트리의 탐색함수
+AVL_node* avl_search(AVL_node* node, int key)
+{
+	if (node == NULL) return NULL;
+	printf("%d ", node->data);
+	if (key == node->data) return node;
+	else if (key < node->data)
+		return avl_search(node->left_child, key);
+	else
+		return avl_search(node->right_child, key);
+}
+void search(AVL_node* node)
+{
+	if(node == NULL)
+	{
+		return;
+	}
+	
+	search(node->left_child);
+	printf("%d ", node->data);
+	search(node->right_child);
+}
+void main()
+{
+	//7,8,9,2,1,5,3,6,4 삽입
+	avl_add(&root, 7);
+	avl_add(&root, 8);
+	avl_add(&root, 9);
+	avl_add(&root, 2);
+	avl_add(&root, 1);
+	avl_add(&root, 5);
+	avl_add(&root, 3);
+	avl_add(&root, 6);
+	avl_add(&root, 4);
+
+
+	printf(" 3 삭제 후 트리 : ");
+	delete(&root, 3);
+	search(root);
+	printf("\n");
+	printf("\n");
+	printf(" 5 찾기 : ");
+	avl_search(root, 5);
+	
+
+}
