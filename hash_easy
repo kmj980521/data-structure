@@ -1,0 +1,31 @@
+#define _CRT_SECURE_NO_WARNINGS // scanf 보안 경고로 인한 컴파일 에러 방지
+#include <stdio.h>
+typedef struct post
+{
+	int num;
+	int age;
+
+}Empinfo;
+
+int gethash(int data)
+{
+	return (data % 100);
+}
+int main(void)
+{
+	Empinfo arr[1000];
+	Empinfo emp1={20120003,42};
+	Empinfo emp2 = { 20130213,38 };
+	Empinfo emp3 = { 20146233,41 };
+	
+	arr[gethash(emp1.num)] = emp1;
+	arr[gethash(emp2.num)] = emp2;
+	arr[gethash(emp3.num)] = emp3;
+	Empinfo result1 = arr[gethash(20120003)];
+	Empinfo result2 = arr[gethash(20130213)];
+	Empinfo result3 = arr[gethash(20146233)];
+
+	printf("사번 : %d, 나이 %d\n", result1.num, result1.age);
+	printf("사번 : %d, 나이 %d\n", result2.num, result2.age);
+	printf("사번 : %d, 나이 %d\n", result3.num, result3.age);
+}
