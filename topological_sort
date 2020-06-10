@@ -1,0 +1,299 @@
+#include<stdio.h>
+#include <stdlib.h>
+#define MAX_VERTEX 15
+#define STACK_MAX_SIZE 100
+typedef struct _Node
+{
+	int vertex; //정점
+	struct _Node* link; 
+}GraphNode;
+
+typedef struct graphType
+{
+	int numV; //정점의 개수
+	int numE; //간선의 개수
+	GraphNode* list[MAX_VERTEX]; //정점에 대한 헤드포인터
+	int degree_zero[MAX_VERTEX];
+	int visited_stack[MAX_VERTEX];
+	int visited_queue[MAX_VERTEX];
+}Graph;
+
+
+Graph* initGraph(int n)
+{
+	Graph* newGraph = (Graph*)malloc(sizeof(Graph));
+	newGraph->numV = n; //정점의 개수
+	newGraph->numE=0;
+	for (int i = 0; i < MAX_VERTEX; i++)
+	{
+		newGraph->list[i] = NULL; //초기화
+		newGraph->degree_zero[i] = 0;
+	}
+	return newGraph;
+}
+void insertEdge(Graph* g, int from, int to)
+{
+	if (from >= g->numV || to >= g->numV)
+	{
+		printf("정점 번호를 잘못입력했습니다\n");
+		exit(-1);
+	}
+	GraphNode* newnode = (GraphNode*)malloc(sizeof(GraphNode));
+	newnode->vertex = to; //정점으로 이어짐
+	newnode->link = g->list[from];
+	g->list[from] = newnode;
+}
+typedef struct _SNode
+{
+	int data;
+	struct _SNode* link;
+}Node;
+
+typedef struct _stack
+{
+	Node* top;
+}Stack;
+
+Stack* initStack()
+{
+	Stack* newStack = (Stack*)malloc(sizeof(Stack));
+	newStack->top = NULL; //스택 초기화
+	return newStack;
+}
+int isEmptyStack(Stack* t)
+{
+	if (t->top ==NULL)
+	{
+		return 1;
+	}
+	return 0;
+}
+void pushStack(Stack* t, int num)
+{
+	Node* newnode = (Node*)malloc(sizeof(Node));
+	newnode->data = num;
+	if (t->top == NULL)
+	{
+		t->top = newnode;
+		newnode->link = NULL;
+	}
+	else
+	{
+		newnode->link = t->top;
+		t->top = newnode;
+	}
+
+}
+int popStack(Stack* t)
+{
+	if (isEmptyStack(t))
+	{
+		printf("스택 언더 플로우");
+		exit(-1);
+	}
+	else
+	{
+		int data = t->top->data;//데이터 백업
+		Node* p = t->top;
+		t->top = t->top->link;
+		free(p);
+		return data;
+	}
+}
+int topological_sort_stack(Graph* g)
+{
+	printf("==================================\n");
+	printf("스택 기반 위상정렬 결과를 출력합니다\n");
+	GraphNode* t;
+	Stack* s = initStack(); //스택 초기화
+	int v;
+	int w;
+
+	for (int j = 0; j < g->numV; j++)
+	{
+		t = g->list[j]; // 0번부터 진입차수를 셀 것
+		while (t)
+		{
+			g->degree_zero[t->vertex]++; //t의 정점이 array의 인덱스 값이 되고 +1
+			t = t->link;
+		}
+	}
+	for (int k = 0; k < g->numV; k++)
+	{
+		if (g->degree_zero[k] == 0) // 즉 k가 머리인 간선이 없는 경우 (K로 가는 진입차수가 0인 경우)
+		{
+			pushStack(s, k);
+			g->visited_stack[k] = 1;
+		}
+	}
+	while (!isEmptyStack(s)) //스택이 비면 종료
+	{
+
+		v = popStack(s);//진입차수가 0인 정점
+		if (g->visited_stack[v] == 1)//방문한 노드라면 데이터 출력
+		{
+			printf("%d ->", v);
+		}
+		t = g->list[v]; //한 정점으로부터 이어진 노드를 참조할 것.
+		while (t != NULL)
+		{
+			w = t->vertex; //현재 노드로부터의 정점의 값.
+			g->degree_zero[w]--; //진입차수를 하나 감소
+			if (g->degree_zero[w] == 0)
+			{
+				pushStack(s, w);
+				g->visited_stack[w] = 1;
+			}
+			t = t->link;
+
+		}
+	}
+	printf("\n");
+	printf("==================================\n");
+}
+// ======================================================================
+
+typedef struct _Queue
+{
+	Node* front;
+	Node* rear;
+}Queue;
+
+Queue* initQueue()
+{
+	Queue* newQueue = (Queue*)malloc(sizeof(Queue*));
+	newQueue->front = NULL;
+	newQueue->rear = NULL;
+	return newQueue;
+}
+int isEmptyQueue(Queue* q)
+{
+	if (q->front == NULL)
+	{
+		return 1;
+	}
+	return 0;
+}
+void enQueue(Queue* q, int num)
+{
+	Node* newnode = (Node*)malloc(sizeof(Node));
+	newnode->data = num;
+	newnode->link = NULL;
+	if (isEmptyQueue(q))
+	{
+		q->front = newnode;
+		q->rear = newnode;
+	}
+	else
+	{
+		q->rear->link = newnode;
+		q->rear = newnode;
+	}
+}
+int deQueue(Queue* q)
+{
+	if (isEmptyQueue(q))
+	{
+		printf("큐가 비었습니다\n");
+		exit(-1);
+	}
+	else
+	{
+		Node* newnode = q->front;
+		int data = newnode->data; //데이터를 백업
+		q->front = q->front->link;
+		free(newnode);
+		return data;
+	}
+
+
+}
+int topological_sort_queue(Graph* g)
+{
+	printf("==================================\n");
+	printf("큐 기반 위상정렬 결과를 출력합니다\n");
+	GraphNode* t;
+	Queue* s=initQueue(); //스택 초기화
+	int v;
+	int w;
+	for (int j = 0; j < g->numV; j++)
+	{
+		t = g->list[j]; // 0번부터 진입차수를 셀 것
+		while (t)
+		{
+			g->degree_zero[t->vertex]++; //t의 정점이 배열의 인덱스 값이 되고 +1
+			t = t->link;
+
+		}
+	}
+	for (int k = 0; k < g->numV; k++)
+	{
+		if (g->degree_zero[k] == 0) // 즉 k가 머리인 간선이 없는 경우 (K로 가는 진입차수가 0인 경우)
+		{
+			enQueue(s, k); //q에 삽입하고
+			g->visited_queue[k] = 1; //방문처리
+		}
+	}
+	while (!isEmptyQueue(s)) //스택이 비면 종료
+	{
+		v = deQueue(s);//진입차수가 0인 정점
+		if (g->visited_queue[v] == 1)//방문했던 노드라면 print
+		{
+			printf("%d ->", v);
+		}
+		t = g->list[v]; //한 정점으로부터 이어진 노드를 참조할 것.
+		while (t != NULL)
+		{
+			w = t->vertex; //현재 노드로부터의 정점의 값.
+
+			g->degree_zero[w]--; //진입차수를 감소
+			if (g->degree_zero[w] == 0)//감소해서 진입차수가 0이 됐다면
+			{
+				enQueue(s, w); //큐에 삽입
+				g->visited_queue[w] = 1; //방문처리
+			}
+			t = t->link;
+			
+		}	
+	}
+	printf("\n");
+	printf("==================================\n");
+}
+
+void printGraph(Graph* p)
+{
+	printf("==================================\n");
+	printf("인접리스트 기반인 그래프를 출력합니다\n");
+	GraphNode* t;
+	for (int i = 0; i < p->numV; i++)
+	{
+		t =p->list[i];
+		printf("[%d]->", i);
+		while (t)
+		{
+			printf("%d->", t->vertex);
+			t = t->link;
+		}
+		printf("\n");
+	}
+	printf("==================================\n");
+}
+int main(void)
+{
+	Graph* p;
+	p=initGraph(9); //0~8
+	insertEdge(p,0, 2);
+	insertEdge(p,0, 1);
+	insertEdge(p,1, 4);
+	insertEdge(p, 1, 3);
+	insertEdge(p, 2, 5);
+	insertEdge(p, 2, 4);
+	insertEdge(p, 3, 6);
+	insertEdge(p, 4, 7);
+	insertEdge(p, 6, 8);
+	insertEdge(p, 6, 7);
+	printGraph(p);
+	topological_sort_queue(p);
+	printf("\n");
+	topological_sort_stack(p);
+}
