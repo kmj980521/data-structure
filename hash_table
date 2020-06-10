@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+// 해싱 테이블의 내용을 출력
+#define TABLE_SIZE	7	// 해싱 테이블의 크기=소수 
+#define SIZE 9
+typedef struct {
+	int key;
+} element;
+
+typedef struct list
+{
+	element item;
+	struct list* link;
+}List;
+
+struct List* hash_table[TABLE_SIZE];
+
+// 제산 함수를 사용한 해싱 함수
+int hash_function(int key)
+{
+	return key % TABLE_SIZE;
+}
+
+void make_table()
+{
+	for (int i = 0; i < TABLE_SIZE; i++)
+	{
+		hash_table[i] = NULL; //hash_table 초기화
+	}
+}
+void insertNode(element value)
+{
+	int k = hash_function(value.key); //해시함수를 거쳐 특정한 값으로 변환
+
+	List* newnode = (List*)malloc(sizeof(List));
+	newnode->item = value; //노드 생성
+	newnode->link = NULL;
+	if (hash_table[k] == NULL)
+	{
+		hash_table[k] = newnode;
+	}
+	else {
+		List* take = hash_table[k];
+		while (take->link != NULL) //마지막 노드 찾기
+		{
+			take = take->link; 
+		}
+		take->link = newnode;
+	}
+}
+
+void PrintHashing()
+{
+	printf("==================================\n");
+	List* p;
+	for (int i = 0; i < TABLE_SIZE; i++)
+	{
+		p = hash_table[i];
+		printf("[%d]->", i);
+		while (p)
+		{
+			printf("%d->", p->item);
+			p = p->link;
+		}
+		printf("\n");
+	}
+	printf("==================================\n");
+}
+void FindNode(element value)
+{
+	int k = hash_function(value.key); //해시 값
+	List* p;
+	p = hash_table[k];
+	while (p) //버킷 끝까지 참조를 했다면
+	{
+		if (p->item.key == value.key)
+		{
+			printf("탐색 %d 성공\n", value);
+			return;
+		}
+		p = p->link;
+	}
+	printf("탐색 %d 실패\n",value);
+}
+// 해싱 테이블을 사용한 예제 
+int main(void)
+{
+	int data[SIZE] = { 5, 8, 2, 13, 4, 6, 9, 11, 7 };
+	element list[SIZE] = { NULL };
+	for (int i = 0; i < SIZE; i++)
+	{
+		list[i].key = data[i];
+	}
+
+	make_table();
+
+	for (int i = 0; i < SIZE; i++)
+	{
+		insertNode(list[i]);
+	}
+	
+	PrintHashing();
+
+	for (int i = 0; i < SIZE; i++)
+	{
+		FindNode(list[i]);
+	}
+
+}
