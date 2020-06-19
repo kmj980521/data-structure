@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define ARRAY_LENGTH 10
+
+
+void sel_sort(int arr[], int size)
+{
+	int index = 0;
+	int temp;
+	for (int i = 0; i < size; i++)
+	{
+		int min = 10000;
+		int index = i;
+		for (int j = i; j < size; j++)
+		{
+			if (arr[j] <min)
+			{
+				min = arr[j];
+				index = j;
+			}
+		}
+		temp = arr[i];
+		arr[i] = arr[index];
+		arr[index] = temp;
+	}
+	printf("========== 선택정렬 결과를 출력합니다.( 시간 복잡도: O(n^2))\n");
+	for (int i = 0; i < 10; i++)
+	{
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+}
+
+typedef struct myHEAP
+{
+	int num;
+	int array[ARRAY_LENGTH];
+}heap;
+
+void heapinit(heap* input)
+{
+	input->num = 0;
+	for (int i = 0; i < ARRAY_LENGTH; i++)
+	{
+		input->array[i] = 0;
+	}
+	
+}
+int isempty(heap* input)
+{
+	if (input->num == 0)
+	{
+		return 1;
+	}
+	else
+		return 0;
+}
+int is_full(heap* input)
+{
+	if (input->num == ARRAY_LENGTH - 1)
+	{
+		return 1;
+	}
+	else
+		return 0;
+}
+void insert_small_heap(heap* input, int data)
+{
+	int i=input->num +1; //마지막 인덱스 
+
+	while(i != 1)
+	{
+		if (data < input->array[i / 2])
+		{
+			input->array[i] = input->array[i / 2];
+			i = i / 2;
+		}
+		else
+			break;
+	}
+	input->array[i] = data;
+	input->num += 1;
+}
+int delete_small_heap(heap* input)
+{
+	int first_data = input->array[1]; //첫번째 데이터
+	int last_data = input->array[input->num]; //마지막 데이터
+
+	int parent = 1;
+	int child=2;
+	while (child <= input->num)
+	{
+		if ((child < input->num) && ((input->array[child]) > (input->array[child + 1])))
+		{
+			child++;
+		}
+		if (last_data <= input->array[child])
+		{
+			break;
+		}
+		input->array[parent] = input->array[child];
+		parent = child;
+		child *= 2;
+	}
+	input->array[parent] = last_data;
+	return first_data;
+}
+void heap_sort(int arr[], int size)
+{
+	printf("========== 힙정렬 결과를 출력합니다.( 시간 복잡도: O(nlogn))\n");
+	heap* myheap=(heap*)malloc(sizeof(heap));
+	heapinit(myheap);
+	for (int i = 0; i < ARRAY_LENGTH; i++)
+	{
+		insert_small_heap(myheap, arr[i]);
+	}
+	for (int i = 0; i < ARRAY_LENGTH; i++)
+	{
+		arr[i]=delete_small_heap(myheap);
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		printf("%d ", arr[i]);
+	}
+}
+
+
+int main(void)
+{
+	int arr[10] = { 7,4,2,1,5,8,9,10,3,6 };
+	sel_sort(arr, sizeof(arr) / sizeof(int));
+	
+	int arr2[10] = { 7,4,2,1,5,8,9,10,3,6 };
+	heap_sort(arr, sizeof(arr) / sizeof(int));
+	
+	
+
+	return 0;
+}
