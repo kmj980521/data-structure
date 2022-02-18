@@ -1,0 +1,287 @@
+#include <stdio.h>
+#include <string.h>
+
+typedef struct NodeType
+{
+	int data; //2바이트 문자 
+	struct NodeType* next_link; //다음 링크 
+}Node;
+typedef struct Linked_List
+{
+	Node* head_node; //처음 노드
+	Node* last_node;// 삭제를 위해 사용, position노드보다 한칸 뒤에 위치.
+	int numofdata; //노드의 수
+}LinkedList;
+
+LinkedList* createLinkedList()
+{
+	LinkedList* newList;
+	newList = (LinkedList*)malloc(sizeof(LinkedList)); //동적할당.
+	newList->head_node = NULL;
+	newList->last_node = NULL;
+	newList->numofdata = 0; //요소의 수는 0으로 초기화.
+	return newList; //동적할당을 받은 List를 반환
+}
+void insertFront(LinkedList* inputList, int input) //리스트의 앞에 노드를 삽입.
+{
+	Node* newnode;
+	newnode = (Node*)malloc(sizeof(newnode)); //동적할당 
+	newnode->data = input;
+
+	if (inputList->head_node == NULL) //노드가 없을 경우. 
+	{
+		newnode->next_link = newnode; //자기자신을 가리킴
+		inputList->head_node = newnode; //첫번째 노드임을 알려줌.
+		inputList->last_node = newnode;//처음이자 끝 노드임을 알려줌. 앞에 노드를 넣어주면 어차피 끝은 유지됨.
+	}
+	else {
+		Node* cur = (Node*)malloc(sizeof(Node));
+		cur = inputList->head_node; //head노드가 가리키는 노드를 복사. 
+		for (int i = 0; i < (inputList->numofdata) - 1; i++) //끝의 노드를 알아냄.
+		{
+			cur = cur->next_link;
+		}
+		newnode->next_link = inputList->head_node;
+		cur->next_link = newnode;
+		inputList->head_node = newnode;
+	}
+	(inputList->numofdata)++;
+	
+}
+void insertLast(LinkedList* inputList, int input)
+{
+	Node* newnode;
+	newnode = (Node*)malloc(sizeof(newnode)); //동적할당 
+	newnode->data = input;
+	if (inputList->head_node == NULL) //노드가 없을 경우. 
+	{
+		newnode->next_link = newnode; //자기자신을 가리킴
+		inputList->head_node = newnode; //첫번째 노드임을 알려줌.
+	}
+	else {
+		Node* cur = (Node*)malloc(sizeof(Node));
+		cur = inputList->head_node; //head노드가 가리키는 노드를 복사. 
+		for (int i = 0; i < (inputList->numofdata) - 1; i++) //끝의 노드를 알아냄.
+		{
+			cur = cur->next_link;
+		}
+		cur->next_link = newnode;
+		newnode->next_link = inputList->head_node;
+		inputList->last_node = newnode;
+	}
+	(inputList->numofdata)++;
+}
+void insertMiddle(LinkedList* inputList, int input, int num) // num번째 위치에 새로운 노드를 삽입. 
+{
+	if (num <= 1 || num >= inputList->numofdata)// 순서는 첫 번째부터니 0번째, -1... 음수의 경우와, 마지막으로 넣는 것은 insertlast함수가 있으니 제외.
+	{
+		printf("넣고싶은 위치를 잘못 입력을 하셨습니다. 음수가 아닌 1~%d (리스트의 현재 요소수-1) 만큼 숫자를 다시 입력하세요\n", (inputList->numofdata)-1);
+		printf("맨 앞에 입력하려는 경우 inserFront함수를 호출해주세요 \n");
+		printf("맨 끝에 입력하려는 경우 inserLast함수를 호출해주세요 \n");
+		printf("\n");
+		return;
+	}
+		Node* newnode;
+		newnode = (Node*)malloc(sizeof(newnode)); //동적할당 
+		newnode->data = input;
+		if (inputList->head_node == NULL) //노드가 없을 경우. 
+		{
+			newnode->next_link = newnode; //자기자신을 가리킴
+			inputList->head_node = newnode; //첫번째 노드임을 알려줌.
+		}
+		else
+		{
+			Node* curback = (Node*)malloc(sizeof(Node)); //입력하려는 위치의 뒤
+			Node* curfront = (Node*)malloc(sizeof(Node));//입력하려는 위치의 앞.
+			curback = inputList->head_node;
+			curfront = inputList->head_node;
+			for (int i = 0; i < num - 1; i++) //입력하려는 위치의 앞으로 curfront를 보냄
+			{
+				curfront = curfront->next_link;
+			}
+			for (int i = 0; i < num - 2; i++)//입력하려는 위치의 뒤로 curback을 보냄
+			{
+				curback = curback->next_link;
+			}
+			newnode->next_link = curfront;
+			curback->next_link = newnode;
+		}
+		printf("입력이 완료되었습니다\n");
+		(inputList->numofdata)++;
+
+}
+void printList(LinkedList* inputList) //연결리스트를 순서대로 출력
+{
+	if (inputList->head_node == NULL)
+	{
+		printf("현재 리스트가 존재하지않습니다. 다시 시작해주세요\n");
+		return;
+	}
+	Node* cur = (Node*)malloc(sizeof(Node));
+		cur = inputList->head_node;
+		printf("리스트의 요소를 앞에서부터 꺼내옵니다\n");
+	for (int i = 0; i < (inputList->numofdata); i++)
+	{
+		printf("%d ", cur->data);
+		cur = cur->next_link;
+	}
+	printf("\n");
+}
+int findNum(LinkedList* inputList, int num) //num이 있는지 확인
+{
+	if (inputList->head_node == NULL)
+	{
+		printf("현재 리스트가 존재하지않습니다. 다시 시작해주세요\n");
+		return;
+	}
+	int count = 0; //몇개있는지
+	Node* cur = (Node*)malloc(sizeof(Node));
+	cur = inputList->head_node;
+	for (int i = 0; i < (inputList->numofdata); i++) //리스트 끝까지 돌면서 값을 확인.
+	{	
+		if (cur->data == num)//값이 있다면 count 증가 
+		{
+			count++;
+		}
+		cur = cur->next_link;
+	}
+	if (count == 0)
+	{
+		printf("찾고싶으신 값 %d는 존재하지 않습니다.\n", num);
+	}
+	else {
+		printf("찾고싶으신 값 %d는 현재 리스트에 존재합니다.\n", num);
+	}
+	return count;
+	
+}
+
+void removeNum(LinkedList* inputList, int num) //num의 값이 들어가있는 노드 삭제.
+{
+	if (inputList->head_node == NULL) //만약 리스트가 비어있을 때
+	{
+		printf("현재 리스트가 존재하지않습니다. 다시 시작해주세요.\n");
+		return ;
+	}
+	Node* del=inputList->head_node;
+	Node* del2 = inputList->last_node;
+
+	if (inputList->head_node->data == num) {
+		
+		
+		if (inputList->head_node->next_link==inputList->head_node) //요소가 하나일 때 .
+		{
+			del = inputList->head_node;//삭제하려는 노드 백업
+			inputList->head_node = NULL;
+			inputList->last_node = NULL;
+			(inputList->numofdata)--;
+
+			return;
+			
+		}
+		else {
+			inputList->head_node = inputList->head_node->next_link;//head_node를 한 칸 오른쪽으로 이동
+			inputList->last_node->next_link = inputList->head_node;
+			(inputList->numofdata)--;
+			return;
+			}
+	}//첫번째 노드의 데이터 값을 삭제하고싶을 때 
+	for (int i = 0; i < (inputList->numofdata) - 1; i++) //리스트 끝까지 탐색
+	{
+	
+		del = del->next_link; //del을 한 칸 오른쪽으로 이동.
+		del2 = del2->next_link; //del2를 한 칸 오른쪽으로 이동
+		if (del->data == num)//해당 값을 찾음.
+		{
+			if (del == inputList->last_node)//만약 그게 마지막 노드라면?
+			{
+				inputList->last_node = del2; //마지막 노드를 왼쪽으로 한 칸 이동 .
+			}
+			del2->next_link = del->next_link;
+			(inputList->numofdata)--;
+			return;
+		}
+	}
+
+	free(del);
+}
+void Numofdata(LinkedList* inputList)
+{
+	printf("리스트의 현재 요소의 수는 %d개입니다 \n", inputList->numofdata);
+}
+void freeList(LinkedList* inputList)
+{
+	if (inputList->head_node == NULL) //요소가 존재하지않을 때
+	{
+		printf("현재 리스트가 존재하지않습니다. 다시 시작해주세요");
+		return;
+	}
+	 
+	Node *fre = (Node*)malloc(sizeof(Node));
+	int k = inputList->numofdata;
+	int i = 0;
+	while (i<k)
+	{
+		fre = inputList->head_node;
+		free(fre);
+		fre = NULL;
+		inputList->head_node = inputList->head_node->next_link; //다음노드 참조
+		(inputList->numofdata)--;//요소수 1감소
+		i++;
+	}
+	inputList->head_node = NULL; 
+
+}
+int main()
+{
+	LinkedList* myList;
+	myList=createLinkedList();
+	printf("(0)리스트가 비어있는지 확인하기\n");
+	printList(myList);
+	removeNum(myList, 30);
+	printf("\n");
+
+	printf("(1) 리스트 앞에 숫자 10, 20, 30 넣어주기\n");
+	insertFront(myList, 10);
+	insertFront(myList, 20);
+	insertFront(myList, 30);
+	printList(myList);
+	printf("뒤로 미루는 방식이라 왼쪽부터 30,20,10이 출력\n");
+	printf("\n");
+
+	printf("(2) 리스트 중간에 숫자 40,50 넣어주기\n");
+	insertMiddle(myList, 40,3);//맨 끝에 넣는 것은 last함수로 호출하라고 오류 발생.
+	insertMiddle(myList, 40, 2);
+	insertMiddle(myList, 50, 2);
+	printList(myList);
+	printf("\n");
+
+	printf("(3) 리스트 마지막에 숫자 60,70 넣어주기\n");
+	insertLast(myList, 60);
+	insertLast(myList, 70);
+	printList(myList);
+	printf("\n");
+
+	printf("(4)리스트의 현재 요소의 수 확인하기\n");
+	Numofdata(myList);
+	printf("\n");
+
+	printf("(5)리스트에서 값이 40인 노드 탐색\n");
+	findNum(myList,40);
+	printf("\n");
+
+	printf("(6)리스트에서 값이 30인 노드 삭제\n");
+	removeNum(myList, 30);
+	printList(myList);
+	Numofdata(myList);
+	printf("\n");
+	
+	printf("(7)리스트 메모리를 해제합니다\n");
+	freeList(myList);
+	printf("===삭제 연산 후===\n");
+	printList(myList);
+	
+	
+	
+	return 0;
+}
